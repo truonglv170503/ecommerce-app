@@ -5,11 +5,11 @@ exports.addAddress = async (req, res) => {
     const { userId } = req.params;
     const newAddress = req.body;
 
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { $push: { addresses: newAddress } },
-      { new: true }
-    );
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    user.addresses.push(newAddress);
+    await user.save();
 
     res.status(200).json({ message: "Address added successfully", user: updatedUser });
   } catch (error) {

@@ -2,12 +2,20 @@ import React from 'react';
 import {View,Text,StyleSheet} from 'react-native';
 
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack'; 
 import StackNavigator from './navigation/StackNavigator';
+import store from "./store";
+import { Provider } from "react-redux";
+import { UserContext } from "./UserContext";
+import { ModalPortal } from 'react-native-modals';
 function App(){
-    const Stack = createNativeStackNavigator()
     return(
-        <><StackNavigator/></>
+        <Provider store={store}>
+            <UserContext>
+                <StackNavigator />
+                <ModalPortal/>
+            </UserContext>
+            
+        </Provider>
     )
 };
 

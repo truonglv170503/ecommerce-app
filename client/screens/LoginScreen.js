@@ -7,16 +7,54 @@ import { StyleSheet,
     KeyboardAvoidingView,
     TextInput 
   } from 'react-native'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useNavigation } from '@react-navigation/native';
-
-
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Toast from 'react-native-toast-message';
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigation = useNavigation();
-  
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      try {
+        const token = await AsyncStorage.getItem("authToken");
+
+        if (token) {
+          navigation.replace("Main");
+        }
+      } catch (err) {
+        console.log("error message", err);
+      }
+    };
+    checkLoginStatus();
+  }, []);
+  const handleLogin = () => {
+    const user = {
+      email: email,
+      password: password,
+    };
+
+    axios
+      // .post("http://localhost:8000/auth/login", user)
+      .post("http://localhost:8000/login", user)
+      .then((response) => {
+        console.log(response);
+        const token = response.data.token;
+        AsyncStorage.setItem("authToken", token);
+        navigation.replace("Main");
+      })
+      .catch((error) => {
+        Toast.show({
+          type: 'error',
+          text1: 'Login Failed',
+          text2: 'Please try again.',
+        })
+        console.log(error);
+      });
+  };
   return (
     <SafeAreaView style={{flex:1,backgroundColor:"white" ,alignItems:"center"}}>
       <View>
@@ -73,7 +111,17 @@ const LoginScreen = () => {
           <Text style={{color:"blue"}}>Forgot Password</Text>
         </View>
         <View style={{marginTop:40}}>
-              <Pressable style={{width:200,borderRadius:10,backgroundColor:"#FEBE10",alignItems:"center",justifyContent:"center",marginLeft:"auto",marginRight:"auto",height:40}}>
+              <Pressable
+              onPress={handleLogin} 
+              style={{
+                width:200,
+                borderRadius:10,
+                backgroundColor:"#FEBE10",
+                alignItems:"center",
+                justifyContent:"center",
+                marginLeft:"auto",
+                marginRight:"auto",
+                height:40}}>
                 <Text style={{fontSize:17,fontWeight:"bold",color:"white"}}>Login</Text>
               </Pressable>
               <Pressable
@@ -86,6 +134,7 @@ const LoginScreen = () => {
         </Pressable>
         </View>
       </KeyboardAvoidingView>
+      <Toast/>
     </SafeAreaView>
   )
 }

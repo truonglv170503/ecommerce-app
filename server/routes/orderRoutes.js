@@ -4,7 +4,7 @@ const { createOrder, getOrdersByUser, getOrderById } = require("../controllers/o
 const router = express.Router();
 
 router.post("/create", createOrder);
-router.get("/user/:userId", getOrdersByUser);
+router.get("/:userId", getOrdersByUser);
 router.get("/:orderId", getOrderById);
 
 module.exports = router;

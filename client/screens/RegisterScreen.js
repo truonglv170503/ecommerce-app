@@ -5,17 +5,49 @@ import { StyleSheet,
      SafeAreaView,
      Image,
      KeyboardAvoidingView,
-     TextInput 
+     TextInput, 
+     Alert
    } from 'react-native'
  import React, { useState } from 'react'
  import AntDesign from '@expo/vector-icons/AntDesign';
  import { useNavigation } from '@react-navigation/native';
+ import axios from 'axios';
+ import Toast from 'react-native-toast-message';
 
 const RegisterScreen = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [name, setName] = useState("");
     const navigation = useNavigation();
+    const handleRegister = () =>{
+        const user={
+            name:name,
+            email:email,
+            password:password,
+        };
+        //api call
+        axios.post("http://localhost:8000/register",user).then((res)=>{
+            console.log(res);
+            // Alert.alert("Registration successful. Please check your email for verification.");
+            Toast.show({
+                type: 'success',
+                text1: 'Registration Successful',
+                text2: 'Please check your email for verification.',
+            });
+            //alert("Registration successful. Please check your email for verification.");
+            setName("");
+            setEmail("");
+            setPassword("");
+        }).catch((err)=>{
+            // Alert.alert("Registration failed");
+            Toast.show({
+                type: 'error',
+                text1: 'Registration Failed',
+                text2: 'Please try again.',
+            });
+            console.log("Registration failed",err);
+        })
+    };
     
     return (
       <SafeAreaView style={{flex:1,backgroundColor:"white" ,alignItems:"center"}}>
@@ -92,11 +124,22 @@ const RegisterScreen = () => {
             <Text style={{color:"blue"}}>Forgot Password</Text>
           </View>
           <View style={{marginTop:40}}>
-                <Pressable style={{width:200,borderRadius:10,backgroundColor:"#FEBE10",alignItems:"center",justifyContent:"center",marginLeft:"auto",marginRight:"auto",height:40}}>
+                <Pressable 
+                onPress={handleRegister} 
+                style={{
+                    width:200,
+                    borderRadius:10,
+                    backgroundColor:"#FEBE10",
+                    alignItems:"center",
+                    justifyContent:"center",
+                    marginLeft:"auto",
+                    marginRight:"auto",
+                    height:40
+                    }}>
                   <Text style={{fontSize:17,fontWeight:"bold",color:"white"}}>Register</Text>
                 </Pressable>
                 <Pressable
-                  onPress={() => navigation.navigate("Login")}
+                  onPress={() => navigation.goBack()}
                   style={{ marginTop: 15 }}
                 >
                 <Text style={{ textAlign: "center", color: "gray", fontSize: 16 }}>
@@ -105,6 +148,7 @@ const RegisterScreen = () => {
           </Pressable>
           </View>
         </KeyboardAvoidingView>
+        <Toast />
       </SafeAreaView>
     )
   }
